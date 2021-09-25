@@ -1,0 +1,191 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Pong</title>
+		<style>
+			* { margin: 0; background-color: black; }
+			canvas { background: black; display: block; margin: 0 auto; border-top: 5px solid white; border-bottom: 5px solid white; border-left: 5px dotted white; border-right: 5px dotted white; }
+		</style>
+	</head>
+	<body>
+		<canvas id="gameCanvas"></canvas>
+		<script>
+			//canvas variables
+			var canvas = document.getElementById("gameCanvas");
+			var ctx = canvas.getContext("2d"); //renders 2d images
+			canvas.height = 500;
+			canvas.width = 800;
+			
+			//ball variables
+			var ballX = (canvas.width/2)
+			var ballY = (canvas.height/2)
+			var ballRadius = 10;
+			var ballXspd = 3;
+			var ballYspd = -3;
+			
+			//paddle placements
+			var charX = 0 + 30;
+			var charY = canvas.height-(canvas.height/2);
+			
+			var oppoX = canvas.width - 30;
+			var oppoY = canvas.height-(canvas.height/2);
+			
+			//paddle size
+			var paddleHeight = canvas.height/5;
+			var paddleWidth = canvas.width/70;
+			
+			//score variables
+			var scoreOne = 0;
+			var scoreTwo = 0;
+			
+			//opponent ai variables
+			var opponentCount = 0
+			
+			function drawPlayerOne() {
+				ctx.beginPath();
+				ctx.rect(charX, charY, paddleWidth, paddleHeight);
+				ctx.fillStyle = "white";
+				ctx.fill();
+				ctx.closePath();
+			};
+			
+			function drawPlayerTwo() {
+				ctx.beginPath();
+				ctx.rect(oppoX, oppoY, paddleWidth, paddleHeight);
+				ctx.fillStyle = "white";
+				ctx.fill();
+				ctx.closePath();
+			};
+			
+			function drawBall() {
+				ctx.beginPath();
+				ctx.arc(ballX, ballY, ballRadius, 0, Math.PI*2);
+				ctx.fillStyle = "white";
+				ctx.fill();
+				ctx.closePath();
+			};
+			
+			function drawCourtLine() {
+				ctx.beginPath();
+				ctx.rect((canvas.width/2), 0, (canvas.width/140), canvas.height);
+				ctx.fillStyle = "white";
+				ctx.fill();
+				ctx.closePath();
+			};
+			
+			function drawScoreOne() {
+				ctx.font = "60px Courier";
+				ctx.fillText(scoreOne, 0 + (canvas.width/3), canvas.height/5);
+			};
+
+			function drawScoreTwo() {
+				ctx.font = "60px Courier";
+				ctx.fillText(scoreTwo, canvas.width - (canvas.width/3), canvas.height/5);
+			};
+
+			function game() {
+				//clears former sprite positions to make animation smooth
+				ctx.clearRect(0, 0, canvas.width, canvas.height);
+				//adds players
+				drawPlayerOne();
+				drawPlayerTwo();
+				//adds ball
+				drawBall();
+				//adds stadium line
+				drawCourtLine();
+				//adds scoreboard
+				drawScoreOne();
+				drawScoreTwo();
+				//ball movement
+				ballX += ballXspd;
+				ballY += ballYspd;
+				
+				//ai movement
+				//aiFunction();
+				
+				//wall hit functionality
+				//goals
+				//right wall
+				if (ballX + ballXspd > canvas.width-ballRadius) {
+					ballX = canvas.width/2;
+					ballY = canvas.height/2;
+					scoreOne = scoreOne += 1
+				}
+				//left wall
+				else if (ballX + ballXspd < ballRadius) {
+					ballX = canvas.width/2;
+					ballY = canvas.height/2;
+					scoreTwo = scoreTwo += 1
+				}
+				
+				//top bottom walls
+				if (ballY + ballYspd > canvas.height - ballRadius || ballY + ballYspd < ballRadius) {
+					ballYspd = -ballYspd;
+				}
+				
+				//paddle hit functionality
+				
+				//player one
+				if (charX + paddleWidth >= ballX + ballXspd && ballY > charY && ballY < charY + paddleHeight) {
+					ballXspd = -ballXspd;
+				}
+				
+				//player two/AI
+				if (oppoX - (paddleWidth/2) <= ballX + ballXspd && ballY > oppoY && ballY < oppoY + paddleHeight) {
+					ballXspd = -ballXspd;
+				}
+			};
+			
+			// establishing key press functions
+			document.onkeydown = function(e) {
+				switch (e.keyCode) {
+					case 38:
+						moveUp();
+						break;
+					case 40:
+						moveDown();
+						break;
+				}
+			};
+			
+			//player moving functions
+			
+			//up
+			function moveUp() {
+				if (charY > 0) {
+					charY -= 30;
+				}
+			};
+			
+			//down
+			function moveDown() {
+				if (charY < canvas.height - paddleHeight) {
+					charY += 30;
+				}
+			};
+			
+			//ai functionality
+			//ai move up
+			function aiMoveUp() {
+				if (oppoY > 0) {
+					oppoY -= 30;
+				}
+			};
+			
+			//ai move down
+			function aiMoveDown() {
+				if (oppoY < canvas.height - paddleHeight) {
+					oppoY += 30;
+				}
+			};
+			
+			//function aiFunction() {
+			//	oppoY = ballY;
+			//};
+			
+			setInterval(game, 10);
+		</script>
+	</body>
+</html>

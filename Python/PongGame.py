@@ -1,6 +1,6 @@
-#importing and initialising pygame
-import pygame
-import random
+#importing and initialising pygame and other libraries
+import pygame, random, sys
+from pygame.locals import *
 from random import randint
 pygame.init()
 #colours
@@ -15,7 +15,11 @@ player1score = 0
 player2score = 0
 clock = pygame.time.Clock()
 #setting up window
-gameWindow = pygame.display.set_mode((700, 500))
+gameWindow = pygame.display.set_mode((700, 500), pygame.HWSURFACE|pygame.DOUBLEBUF|pygame.RESIZABLE)
+##get window surface
+windowWidth = int(pygame.display.Info().current_w)
+windowHeight = int(pygame.display.Info().current_h)
+
 #menu function
 def pong_menu():
     #colours
@@ -35,6 +39,13 @@ def pong_menu():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 quit()
+        for event in pygame.event.get():
+            #allowing closing of game through GUI
+            if event.type == pygame.QUIT:
+                runProgram = False
+            #window resizing dynamic adjustment
+            if event.type == VIDEORESIZE:
+                gameWindow = pygame.display.set_mode((windowWidth, windowHeight), pygame.HWSURFACE|pygame.DOUBLEBUF|pygame.RESIZABLE)
         #menu background colour
         gameWindow.fill(colourGreen)
         #menu text
@@ -62,11 +73,23 @@ def pong_menu():
                         pygame.quit()
                         quit()
         #menu buttons
-        button(ballColour, 150, 190, 150, 50, "singleplayer")
-        button(colourBlue, 150, 250, 150, 50, "multiplayer")
-        button(colourRed, 150, 310, 150, 50, "quit")
+        button(ballColour, 150, 190, 500, 50, "singleplayer")
+        button(colourBlue, 150, 250, 500, 50, "multiplayer")
+        button(colourRed, 150, 310, 500, 50, "quit")
+        #singleplayer button text
+        splaybuttonfont = pygame.font.Font(None, 75)
+        splaybuttontext = splaybuttonfont.render("Singleplayer", 1, colourWhite)
+        gameWindow.blit(splaybuttontext, (150, 190))
+        #multiplayer button text
+        mplaybuttonfont = pygame.font.Font(None, 75)
+        mplaybuttontext = mplaybuttonfont.render("Local Multiplay", 1, colourWhite)
+        gameWindow.blit(mplaybuttontext, (150, 250))
+        #singleplayer button text
+        quitbuttonfont = pygame.font.Font(None, 75)
+        quitbuttontext = quitbuttonfont.render("Quit Game", 1, colourWhite)
+        gameWindow.blit(quitbuttontext, (150, 310))
         #updates menu
-        pygame.display.flip()
+        pygame.display.update()
         clock.tick(15)
 
 def singleplayer_pong():
@@ -120,7 +143,7 @@ def singleplayer_pong():
             self.vel[0] = -self.vel[0]
             self.vel[1] = randint (-8, 8)
     #setting up window
-    gameWindow = pygame.display.set_mode((700, 500))
+    gameWindow = pygame.display.set_mode((pygame.display.Info().current_w, pygame.display.Info().current_h), pygame.HWSURFACE|pygame.DOUBLEBUF|pygame.RESIZABLE)
     pygame.display.set_caption("Pong")
     #paddle 1 settings
     paddle1 = paddle(colourRed, 10, 100)
@@ -140,7 +163,7 @@ def singleplayer_pong():
     all_sprites_list.add(paddle2)
     all_sprites_list.add(pongball)
     #AI fail functionality
-    AIfailprob = 0.1
+    AIfailprob = 0.3
     #main loop
     runProgram = True
     while runProgram:
@@ -194,7 +217,7 @@ def singleplayer_pong():
         font = pygame.font.Font(None, 74)
         text = font.render(str(player1score) + " - " + str(player2score), 1, colourBlack)
         gameWindow.blit(text, (305, 10))
-        pygame.display.flip()
+        pygame.display.update()
         #FPS
         clock.tick(70)
 #multiplayer_function
@@ -268,10 +291,14 @@ def multiplayer_pong():
     #main loop
     runProgram = True
     while runProgram:
-        #allowing closing of game through GUI
+        #game/GUI events
         for event in pygame.event.get():
+            #allowing closing of game through GUI
             if event.type == pygame.QUIT:
                 runProgram = False
+            #window resizing dynamic adjustment
+            #if event.type == VIDEORESIZE:
+            #    gameWindow = pygame.display.set_mode((event.w, event.h), pygame.HWSURFACE|pygame.DOUBLEBUF|pygame.RESIZABLE)
         #keys
         keys = pygame.key.get_pressed()
         if keys[pygame.K_w]:
@@ -313,7 +340,7 @@ def multiplayer_pong():
         font = pygame.font.Font(None, 74)
         text = font.render(str(player1score) + " - " + str(player2score), 1, colourBlack)
         gameWindow.blit(text, (305, 10))
-        pygame.display.flip()
+        pygame.display.update()
         #FPS
         clock.tick(50)
 #launches game
